@@ -10,24 +10,25 @@ import { useConnectionStore, CONNECTION_STATUS } from '../Store/useConnectionSto
 import { useDccStore } from '../Store/useDccStore';
 import { useEffectStore } from '../Store/useEffectStore';
 import useLayoutEffect from '../Effects/useLayoutEffect';
+import { useDcc } from '../Dcc/useDcc'
 import { useMqtt } from '../Core/Com/MqttProvider'
 
 import './Power.scss'
 
 const specialEfx = [
-  { 
+  {
     name: 'Lights',
     effectId: 201,
   },
-  { 
+  {
     name: 'Layout',
     effectId: 202,
   },
-  { 
+  {
     name: 'Track',
     effectId: 203,
   },
-  { 
+  {
     name: 'ALL',
     effectId: 204,
   }
@@ -40,6 +41,7 @@ export default function SpeedDialTooltipOpen() {
 
   const track = 'MAIN';
   const { dcc } = useMqtt();
+  const { setPower } = useDcc()
   const { updateEffect } = useLayoutEffect();
   const effects = useEffectStore(state => state.effects);
   const powerEfx = effects.filter(efx => efx.type === 'power')
@@ -51,13 +53,10 @@ export default function SpeedDialTooltipOpen() {
 
 
   useEffect(async () => {
-    function sendPower() {
-      dcc('power', `${powerStatus ? 1 : 0} ${track}`)
-    }
     if (typeof powerStatus !== 'undefined') {
-      sendPower();
+      setPower(powerStatus, track);
     }
-  }, [ powerStatus ]);
+  }, [powerStatus]);
 
   const handlePowerClick = async () => {
     setPowerStatus(!powerStatus);

@@ -8,12 +8,10 @@ import Button from '@mui/material/Button';
 import { useMqtt } from '../Core/Com/MqttProvider'
 import { useConnectionStore } from '../Store/useConnectionStore';
 
-export const DccDeviceDialog = ({ onClose, open }) => {
+export const DccDeviceDialog = ({ onClose, open, ports }) => {
 
   const setDccDevice = useConnectionStore(state => state.setDccDevice);
   const layoutId = useConnectionStore(state => state.layoutId);
-  const connsStore = useConnectionStore(state => state);
-  const ports = useConnectionStore(state => state.ports);
   const { publish, isConnected } = useMqtt();
   const [newDccDevice, setNewDccDevice] = useState(null);
 

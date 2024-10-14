@@ -4,6 +4,7 @@ import { useThrottleStore } from '../Store/useThrottleStore';
 import { useLocoStore } from '../Store/useLocoStore';
 import { useConnectionStore } from '../Store/useConnectionStore';
 import { useMqtt } from '../Core/Com/MqttProvider'
+import { useDcc } from '../Dcc/useDcc'
 
 const SWITCH_DIR_DELAY = 250;
 
@@ -15,13 +16,11 @@ export const DccExThrottleController = props => {
   const upsertThrottle = useThrottleStore(state => state.upsertThrottle);
   const updateLoco = useLocoStore(state => state.updateLoco);
   const { publish } = useMqtt();
+  const { setSpeed } = useDcc()
   const prevSpeed = usePrevious(speed);
 
   const publishSepeed = (address, speed, enableThrottleUpsert = true) => {
-    publish(`@ttt/dcc/${layoutId}`, JSON.stringify({
-      action: 'throttle',
-      payload: { address, speed }
-    }))
+    setSpeed(address, speed);
     if (enableThrottleUpsert) {
       upsertThrottle({ address, speed });
     }
