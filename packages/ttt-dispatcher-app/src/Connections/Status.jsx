@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import SignalWifiStatusbarNullIcon from '@mui/icons-material/SignalWifiStatusbarNull';
@@ -11,18 +12,21 @@ import ReplayIcon from '@mui/icons-material/Replay';
 
 import { useConnectionStore, CONNECTION_STATUS } from '../Store/useConnectionStore';
 import { useMqtt } from '../Core/Com/MqttProvider'
+import { firebaseApp } from '../firebase';
 
 export const Status = () => {
 
+  const auth = getAuth(firebaseApp)
   const { isConnected: mqttConnected } = useMqtt();
   const layoutId = useConnectionStore(state => state.layoutId);
+  const isGuest = useConnectionStore(state => state.isGuest);
   const status = useConnectionStore(state => state.status);
   const dccDeviceStatus = useConnectionStore(state => state.dccDeviceStatus);
 
-  const dccConnected = mqttConnected && dccDeviceStatus === CONNECTION_STATUS.CONNECTED;
+  const dccConnected = (mqttConnected && dccDeviceStatus === CONNECTION_STATUS.CONNECTED) || (auth?.currentUser && dccDeviceStatus === CONNECTION_STATUS.CONNECTED);
 
   const allConnected = status === CONNECTION_STATUS.CONNECTED
-    && mqttConnected
+    && (mqttConnected || auth?.currentUser)
     && dccDeviceStatus === CONNECTION_STATUS.CONNECTED
 
   function renderIcon() {
@@ -35,18 +39,18 @@ export const Status = () => {
       ? <UsbOutlinedIcon sx={{ fill: '#21ff15' }} />
       : <UsbOffOutlinedIcon sx={{ fill: 'red' }} />
   }
-  
+
   return (
     <>
       <a href="/">
         <ReplayIcon
-          sx={{ 
+          sx={{
             color: 'white',
             display: {
               xs: 'none',
               sm: 'flex'
             },
-            mr: 2 
+            mr: 2
           }} />
       </a>
       <Link to="/dcc">
@@ -56,12 +60,12 @@ export const Status = () => {
           size="small"
           icon={renderDccIcon()}
           variant='outlined'
-          sx={{ 
+          sx={{
             display: {
               xs: 'none',
               sm: 'flex'
             },
-            mr: 2 
+            mr: 2
           }}
         />
         <Box sx={{ mr: 2, display: { sx: 'flex', sm: 'none' } }}>
@@ -75,12 +79,12 @@ export const Status = () => {
           size="small"
           icon={renderIcon()}
           variant='outlined'
-          sx={{ 
+          sx={{
             display: {
               xs: 'none',
               sm: 'flex'
             },
-            mr: 2 
+            mr: 2
           }}
         />
         <Box sx={{ mr: 2, display: { xs: 'flex', sm: 'none' } }}>

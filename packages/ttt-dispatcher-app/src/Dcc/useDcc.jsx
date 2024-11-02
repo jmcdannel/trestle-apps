@@ -1,8 +1,13 @@
 import { useEffect } from 'react'
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useMqtt } from '../Core/Com/MqttProvider'
+import { useDejaCloud } from '../Core/Com/useDejaCloud'
+import { firebaseApp } from '../firebase';
 
 export function useDcc() {
-  const { dcc, isConnected } = useMqtt();  
+  const auth = getAuth(firebaseApp);
+  const { dcc, isConnected } = useMqtt();
+  const { send: dejaCloudSend } = useDejaCloud();
 
   async function setPower(payload, track = 'MAIN') {
     try {
@@ -19,7 +24,7 @@ export function useDcc() {
   }
 
   async function setSpeed(address, speed) {
-    try {   
+    try {
       send('throttle', { address, speed });
     } catch (err) {
       console.error('[DCC API].setSpeed', err);
@@ -28,7 +33,7 @@ export function useDcc() {
   }
 
   async function setTurnout(turnoutId, state) {
-    try {   
+    try {
       send('turnout', { turnoutId, state });
     } catch (err) {
       console.error('[DCC API].setTurnout', err);
@@ -37,7 +42,7 @@ export function useDcc() {
   }
 
   async function setOutput(pin, state) {
-    try {   
+    try {
       send('output', { pin, state });
     } catch (err) {
       console.error('[DCC API].setTurnout', err);
@@ -46,7 +51,7 @@ export function useDcc() {
   }
 
   async function setFunction(address, func, state) {
-    try {   
+    try {
       send('function', { address, func, state });
     } catch (err) {
       console.error('[DCC API].setPower', err);
@@ -55,8 +60,10 @@ export function useDcc() {
   }
 
   async function send(action, payload) {
-    try { 
-      if (isConnected) {  
+    try {
+      if (auth?.currentUser) {
+        dejaCloudSend({ action, payload });
+      } else if (isConnected) {
         dcc(action, payload)
         console.log('DCC send', action, payload)
       } else {
@@ -68,7 +75,7 @@ export function useDcc() {
   }
 
   useEffect(async () => {
-    
+
   }, [])
 
 

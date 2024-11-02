@@ -27,7 +27,7 @@ export const NamePlate = ({
       invisible={consistCount < 2}>
       <Chip
         className="throttle-nameplate"
-        label={limitString(name, 4)}
+        label={limitString(name, 20)}
         size={size}
         disabled={disabled}
         onClick={onClick}
