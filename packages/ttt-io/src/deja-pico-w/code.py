@@ -52,9 +52,9 @@ mqtt_client = MQTT.MQTT(
 def connected(client, userdata, flags, rc):
     # This function will be called when the client is connected
     # successfully to the broker.
-    print(f"Connected to mqtt Listening for topic changes", stopic, ptopic)
-    client.publish(ptopic, "Connected")
     client.subscribe(stopic)
+    client.publish(ptopic, "Connected")
+    print(f"Connected to mqtt Listening for topic changes", stopic, ptopic)
 
 def disconnected(client, userdata, rc):
     # This method is called when the client is disconnected
